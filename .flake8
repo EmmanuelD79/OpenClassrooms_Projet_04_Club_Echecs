@@ -1,0 +1,9 @@
+[flake8]
+ignore = F401
+exclude =
+    env,
+    .MD,
+    __init__
+format = html
+htmldir = flake-report
+max-line-length = 119
