@@ -95,7 +95,7 @@ Le menu principal de gestionnaire s'affiche et vous demande de choisir entre:
 <br>
 <br>
 Un fichier JSON nommé "db.json" sera créé dans le répertoire principal du programme pour le stockage des données.
-<br>Un dossier flake-report est présent, nous pouvons y trouver un rapport flake8-htlm.
+<br>Un dossier flake-report est présent, nous pouvons y trouver un rapport flake8-html.
 <br>Pour générer un rapport, vous devez taper la commande dans le terminal:
 ```
 	
