@@ -277,8 +277,8 @@ class TournamentManager(Controller):
             for obj_match in obj_round.matches:
                 if obj_match.match[0][1] == 1:
                     msg_score = f"Le joueur : {obj_match.match[0][0]} est le vainqueur du match"
-                elif obj_match.match[1][1] == 1:
-                    msg_score = f"Le joueur : {obj_match.match[0][0]} est le vainqueur du match"
+                elif obj_match.match[1][1] == 2:
+                    msg_score = f"Le joueur : {obj_match.match[1][0]} est le vainqueur du match"
                 elif (obj_match.match[0][1] == 0) and (obj_match.match[1][1] == 0):
                     msg_score = "Le match n'a pas encore été joué"
                 else:

@@ -66,7 +66,7 @@ class Command:
 
     def show_score(self, player, score, increment):
         print(
-            f"{increment} - {player.first_name} {player.last_name} "
+            f"{increment} - {player.first_name} {player.last_name} ({player.rank}) "
             f"a obtenu {score[1]} point(s)")
 
     def show_stop_tournament(self):
