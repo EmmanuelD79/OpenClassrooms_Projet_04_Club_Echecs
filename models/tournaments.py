@@ -23,14 +23,18 @@ class Tournament:
         self.l_players_points = []
         self._l_attribut = get_list_attribut(self)
 
+    def attribut_getter(self):
+        return self._l_attribut
+
     def start_to_play(self):
         self.start = get_date_hour()
 
     def stop_to_play(self):
         self.stop = get_date_hour()
 
-    def add_player(self, id_player):
-        self.l_players_id.append(id_player)
+    def create_me(self, l_players_id, l_players_points):
+        self.l_players_id = l_players_id
+        self.l_players_points = l_players_points
 
     def add_done_match(self, done_match):
         self.l_done_matches.append(done_match)

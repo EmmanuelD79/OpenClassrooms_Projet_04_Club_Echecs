@@ -30,10 +30,11 @@ class Round:
             couple = [list_sort_players[0], list_sort_players[1]]
         return couple
 
-    def create_me(self, tournament_id, round_n):
+    def create_me(self, tournament_id, list_sort_players, round_n):
         self.tournament_id = tournament_id
         self.round_n = round_n
         self.id = "Round %i" % (self.round_n)
+        self.l_players_id = list_sort_players
 
     def create_match(self, couple_id, match_index):
         match = Match()

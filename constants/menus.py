@@ -29,7 +29,7 @@ DICT_TOURNAMENT_MENU = {
     3: [" 3 - Afficher la liste de tous les tours d'un tournoi",
         "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).list_round_in_tournament()"],
     4: [" 4 - Afficher la liste de tous les matchs d'un tournoi",
-        "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).show_list_matches_by_round_in_tournament()"],
+        "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).list_matches_by_round_in_tournament()"],
     0: [" 0 - Revenir au menu précedent", "Menu(DICT_START_MENU)"]
 }
 

@@ -14,6 +14,9 @@ class Actor:
         self.rank = ""
         self._l_attribut = get_list_attribut(self)
 
+    def attribut_getter(self):
+        return self._l_attribut
+
     def update_rank(self, int_new_ranking):
         self.rank = int_new_ranking
 

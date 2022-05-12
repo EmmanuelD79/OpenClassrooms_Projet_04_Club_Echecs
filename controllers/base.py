@@ -24,46 +24,58 @@ class Controller:
 
         self.dict_actors = Actor().load_all()
         self.dict_tournaments = Tournament().load_all()
+        self.view = Command()
 
     def run(self):
 
         self.menu = Menu(DICT_START_MENU)
 
+    def ask_tournament_id(self):
+        '''Ask ID of the tournament wanted'''
+        validate = False
+        while not validate:
+            attr_value = self.view.prompt_questions(DICT_RUN_TOURNAMENT["id"][0], "id")
+            validate = False
+            if attr_value in self.dict_tournaments:
+                obj_tournament = self.dict_tournaments[attr_value]
+                return obj_tournament
 
-class Menu:
-
-    def __init__(self, dict_menu):
-        self.view = Command()
-        self.menu = dict_menu
-        self.next_menu = eval(self.run())
-
-    def run(self):
-        self.view.show_menu(self.menu)
-        option = len(self.menu) - 1
+    def ask_menu_choice(self, menu):
+        '''Ask and check the menu choice'''
+        option = len(menu) - 1
         regex = f"[0-{option}]" + "{1}$"
         validate = False
         while not validate:
             choice = self.view.ask_choice()
             validate = validate_format(choice, regex)
         choice = int(choice)
-        return self.menu[choice][1]
-
-    def stop(self):
-        self.view.show_quit()
+        return choice
 
 
-class TournamentManager():
+class Menu(Controller):
 
     def __init__(self, dict_menu):
-        self.view = Command()
+        super().__init__()
         self.menu = dict_menu
+        self.next_menu = eval(self.run())
+
+    def run(self):
+        '''manage the menu navigation'''
+        self.view.show_menu(self.menu)
+        choice = super().ask_menu_choice(self.menu)
+        return self.menu[choice][1]
+
+
+class TournamentManager(Controller):
+
+    def __init__(self, dict_menu):
+        super().__init__()
         self.report = Tournament_report()
-        self.control = Controller()
-        self.dict_tournaments = self.control.dict_tournaments
-        self.dict_actors = self.control.dict_actors
+        self.menu = dict_menu
 
     def run_tournament(self):
-        self.obj_tournament = self.ask_tournament_id()
+        '''Run the tournament and manage the round and matches'''
+        self.obj_tournament = super().ask_tournament_id()
         validate = self.add_player_in_tournament()
         if validate:
             validate_exist_round = self.check_round_n()
@@ -85,10 +97,10 @@ class TournamentManager():
         Menu(DICT_TOURNAMENT_MENU)
 
     def create_new_round(self, round_n):
-        new_round = Round()
-        new_round.create_me(self.obj_tournament.id, round_n + 1)
+        '''Create a new round in the tournament'''
         list_sort_players = self.obj_tournament.sort_players_by_points_and_rank()
-        setattr(new_round, "l_players_id", list_sort_players)
+        new_round = Round()
+        new_round.create_me(self.obj_tournament.id, list_sort_players, round_n + 1)
         for match_index in range(MIN_MATCHES, MAX_MATCHES + 1):
             increment = 1
             validate = False
@@ -109,6 +121,7 @@ class TournamentManager():
         self.dict_tournaments = self.obj_tournament.load_all()
 
     def rank_players(self):
+        '''Rank players in tournament'''
         rank = self.obj_tournament.sort_players_by_points_and_rank()
         increment = 1
         for player_id in rank:
@@ -118,6 +131,7 @@ class TournamentManager():
             increment += 1
 
     def update_score_last_round(self, validate_exist_round):
+        '''Do the last round score update'''
         if validate_exist_round:
             last_round = self.obj_tournament.l_rounds[-1]
             if last_round.stop is None:
@@ -136,44 +150,34 @@ class TournamentManager():
                     self.dict_tournaments = self.obj_tournament.load_all()
 
     def resume_matches_in_new_round(self):
+        '''Resume matches of the new round in the tournament'''
         last_round = self.obj_tournament.l_rounds[-1]
         for match in last_round.matches:
             self.report.show_match_round(match)
 
-    def change_list_players(self, list_players, increment):
-        list_players[1], list_players[increment + 1] = list_players[increment + 1], list_players[1]
-        return list_players
-
-    def ask_tournament_id(self):
-        validate = False
-        while not validate:
-            attr_value = self.view.prompt_questions(DICT_RUN_TOURNAMENT["id"][0], "id")
-            valide_format = DICT_RUN_TOURNAMENT["id"][1]
-            validate = validate_format(attr_value, valide_format)
-            if validate:
-                if attr_value in self.dict_tournaments:
-                    obj_tournament = self.dict_tournaments[attr_value]
-                    return obj_tournament
-                else:
-                    validate = False
-
     def check_round_n(self):
+        '''Check the n° of the current round'''
         round_n = len(self.obj_tournament.l_rounds)
+        validate_exist_round = False
         if 0 < round_n <= DEFAULT_NB_ROUND:
             validate_exist_round = True
-        else:
-            validate_exist_round = False
         return validate_exist_round
 
     def validate_pair_players(self, pair, already_done_matches):
+        '''Valide if couple players already don't exists'''
         pair_reverse = [pair[1], pair[0]]
+        validate = True
         if (pair in already_done_matches) or (pair_reverse in already_done_matches):
             validate = False
-        else:
-            validate = True
         return validate
 
+    def change_list_players(self, list_players, increment):
+        '''Take the next player, if the couple players already exists'''
+        list_players[1], list_players[increment + 1] = list_players[increment + 1], list_players[1]
+        return list_players
+
     def add_player_in_tournament(self):
+        '''Add players in current tournament if the list players don't exists'''
         if (len(self.obj_tournament.l_players_id) < MAX_PLAYERS) and \
                 (len(self.dict_actors) >= MAX_PLAYERS):
             lst_players = []
@@ -192,44 +196,42 @@ class TournamentManager():
                     else:
                         confirmation = [increment, selected_player, False]
                         self.view.prompt_validate_add_player(confirmation)
-                setattr(self.obj_tournament, "l_players_id", lst_players)
-                setattr(self.obj_tournament, "l_players_points", score)
+            self.obj_tournament.create_me(lst_players, score)
             self.obj_tournament.start_to_play()
             self.obj_tournament.save_me()
             self.dict_tournaments = self.obj_tournament.load_all()
-
             validate = True
+
         elif len(self.obj_tournament.l_players_id) == MAX_PLAYERS:
             validate = True
         else:
             self.view.prompt_error()
             validate = False
+
         return validate
 
     def create_tournament(self):
+        '''Create a new tournament'''
         self.view.prompt_questions(self.menu["titre"][0], "titre")
         tournament = Tournament()
-        lst_attribut = [
-            attr for attr in tournament.__dict__
-            if not callable(getattr(tournament, attr)) and not attr.startswith("_")
-        ]
-
+        lst_attribut = tournament.attribut_getter()
         for attribut in lst_attribut:
             if attribut in self.menu:
                 msg = self.menu[attribut][0]
                 valide_format = self.menu[attribut][1]
                 validate = False
                 while not validate:
-                    attr_value = self.view.prompt_questions(msg, attribut)
-                    validate = validate_format(attr_value, valide_format)
+                    response = self.view.prompt_questions(msg, attribut)
+                    validate = validate_format(response, valide_format)
                 if attribut == "control_time":
-                    attr_value = CONTROL_TIME[attr_value]
-                setattr(tournament, attribut, attr_value)
+                    response = CONTROL_TIME[response]
+                setattr(tournament, attribut, response)
         tournament.save_me()
         self.dict_tournaments = tournament.load_all()
         Menu(DICT_TOURNAMENT_MENU)
 
     def list_tournaments(self):
+        '''manage the list of all tournaments'''
         for tournament_item in self.dict_tournaments:
             obj_tournament = self.dict_tournaments[tournament_item]
             if obj_tournament.start is None:
@@ -252,8 +254,9 @@ class TournamentManager():
         Menu(DICT_TOURNAMENT_MENU)
 
     def list_round_in_tournament(self):
-        obj_tournament = self.ask_tournament_id()
-        obj_rounds = obj_tournament.l_rounds
+        '''Manage the list of round for one tournament'''
+        self.obj_tournament = super().ask_tournament_id()
+        obj_rounds = self.obj_tournament.l_rounds
         for obj_round in obj_rounds:
             if obj_round.start is None:
                 msg_start = "Le round n'a pas débuté"
@@ -266,9 +269,10 @@ class TournamentManager():
             self.report.show_list_round_in_tournament(obj_round.id, msg_start, msg_stop)
         Menu(DICT_TOURNAMENT_MENU)
 
-    def show_list_matches_by_round_in_tournament(self):
-        obj_tournament = self.ask_tournament_id()
-        obj_rounds = obj_tournament.l_rounds
+    def list_matches_by_round_in_tournament(self):
+        '''Manage the list of matches for one tournament'''
+        self.obj_tournament = super().ask_tournament_id()
+        obj_rounds = self.obj_tournament.l_rounds
         for obj_round in obj_rounds:
             for obj_match in obj_round.matches:
                 if obj_match.match[0][1] == 1:
@@ -288,21 +292,18 @@ class TournamentManager():
         Menu(DICT_TOURNAMENT_MENU)
 
 
-class ActorsManager():
+class ActorsManager(Controller):
 
     def __init__(self, dict_menu):
-        self.view = Command()
-        self.control = Controller()
-        self.dict_actors = self.control.dict_actors
-        self.dict_tournaments = self.control.dict_tournaments
+        super().__init__()
         self.report = Actors_report()
         self.menu = dict_menu
 
     def create_actor(self):
+        '''Create a new actor'''
         self.view.prompt_questions(self.menu["titre"], "titre")
         actor = Actor()
-        lst_attribut = [attr for attr in actor.__dict__ if
-                        not callable(getattr(actor, attr)) and not attr.startswith("_")]
+        lst_attribut = actor.attribut_getter()
         for attribut in lst_attribut:
             msg = self.menu[attribut][0]
             valide_format = self.menu[attribut][1]
@@ -318,8 +319,25 @@ class ActorsManager():
         Menu(DICT_ACTORS_MENU)
 
     def list_actors(self):
+        '''Manage the list of all actors'''
+        lst_actors = self.get_list_actors()
+        self.sort_list_actors(lst_actors)
+        Menu(DICT_ACTORS_MENU)
+
+    def list_actors_in_tournament(self):
+        '''Manage the list of all actors in one tournament'''
+        obj_tournament = super().ask_tournament_id()
+        lst_actors = self.get_list_actors(obj_tournament)
+        self.sort_list_actors(lst_actors)
+        Menu(DICT_ACTORS_MENU)
+
+    def get_list_actors(self, obj_tournament=None):
+        '''Get the list of all actors or players in one tournament'''
+        source_actor_list = self.dict_actors
+        if obj_tournament is not None:
+            source_actor_list = obj_tournament.l_players_id
         lst_actors = []
-        for id_actor in self.dict_actors:
+        for id_actor in source_actor_list:
             obj_actor = self.dict_actors[id_actor]
             lst_actor = [
                 id_actor,
@@ -330,14 +348,12 @@ class ActorsManager():
                 obj_actor.rank
             ]
             lst_actors.append(lst_actor)
+        return lst_actors
+
+    def sort_list_actors(self, lst_actors):
+        '''Sort the list actors by last_name or by Rank'''
         self.view.show_menu(DICT_SORT)
-        option = len(self.menu) - 1
-        regex = f"[0-{option}]" + "{1}$"
-        validate = False
-        while not validate:
-            choice = self.view.ask_choice()
-            validate = validate_format(choice, regex)
-        choice = int(choice)
+        choice = super().ask_menu_choice(self.menu)
         if choice == 1:
             index = INDEX_LAST_NAME
         elif choice == 2:
@@ -350,59 +366,9 @@ class ActorsManager():
                                          obj_actor.date_of_birth,
                                          obj_actor.sex,
                                          obj_actor.rank)
-        Menu(DICT_ACTORS_MENU)
-
-    def list_actors_in_tournament(self):
-        obj_tournament = self.ask_tournament_id()
-        lst_actors = []
-        for id_actor in obj_tournament.l_players_id:
-            obj_actor = self.dict_actors[id_actor]
-            lst_actor = [
-                id_actor,
-                obj_actor.first_name,
-                obj_actor.last_name,
-                obj_actor.date_of_birth,
-                obj_actor.sex,
-                obj_actor.rank
-            ]
-            lst_actors.append(lst_actor)
-        self.view.show_menu(DICT_SORT)
-        option = len(self.menu) - 1
-        regex = f"[0-{option}]" + "{1}$"
-        validate = False
-        while not validate:
-            choice = self.view.ask_choice()
-            validate = validate_format(choice, regex)
-        choice = int(choice)
-        if choice == 1:
-            index = INDEX_LAST_NAME
-        elif choice == 2:
-            index = INDEX_RANK
-        for actor in sorted(lst_actors, key=lambda actor_sort: actor_sort[index]):
-            obj_actor = self.dict_actors[actor[0]]
-            self.report.show_list_actors(
-                obj_actor.id,
-                obj_actor.first_name,
-                obj_actor.last_name,
-                obj_actor.date_of_birth,
-                obj_actor.sex,
-                obj_actor.rank
-            )
-        Menu(DICT_ACTORS_MENU)
-
-    def ask_tournament_id(self):
-        validate = False
-        while not validate:
-            attr_value = self.view.prompt_questions(DICT_RUN_TOURNAMENT["id"][0], "id")
-            valide_format = DICT_RUN_TOURNAMENT["id"][1]
-            validate = validate_format(attr_value, valide_format)
-            if attr_value in self.dict_tournaments:
-                obj_tournament = self.dict_tournaments[attr_value]
-                return obj_tournament
-            else:
-                validate = False
 
     def update_rank_player(self):
+        '''Do the rank of one player update'''
         for key in DICT_UPDATE_RANK:
             if key == "titre":
                 self.view.prompt_questions(DICT_UPDATE_RANK["titre"][0], "titre")
@@ -442,8 +408,8 @@ class ActorsManager():
         Menu(DICT_ACTORS_MENU)
 
 
-class Quit():
+class Quit(Controller):
 
     def __init__(self):
-        self.view = Command()
+        super().__init__()
         self.view.show_quit()
