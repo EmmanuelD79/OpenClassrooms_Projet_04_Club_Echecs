@@ -6,10 +6,10 @@ def get_date_hour():
     return d.now().strftime("Le %d/%m/%Y à %H:%M:%S")
 
 
-def get_list_attribut(objet):
+def get_list_attribut(my_obj):
     l_attribut = [
-        attr for attr in objet.__dict__
-        if not callable(getattr(objet, attr)) and not attr.startswith("_")
+        attr for attr in my_obj.__dict__
+        if not callable(getattr(my_obj, attr)) and not attr.startswith("_")
     ]
     return l_attribut
 

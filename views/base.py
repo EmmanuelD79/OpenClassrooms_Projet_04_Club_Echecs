@@ -1,6 +1,3 @@
-from constants.base import MAX_PLAYERS
-
-
 class Command:
 
     def show_menu(self, dict_menu_to_show):
@@ -31,11 +28,11 @@ class Command:
         selected_player = input(f"Entrer l'id du joueur n°{increment} ?")
         return selected_player
 
-    def prompt_validate_add_player(self, confirmation):
+    def prompt_validate_add_player(self, confirmation, max_players):
         increment, id_player, validate = confirmation
         if validate:
             print(f"Joueur n° {increment} est {id_player}")
-        elif validate and increment == MAX_PLAYERS:
+        elif validate and increment == max_players:
             print(f"Joueur n° {increment} est {id_player}")
             print("tous les joueurs sont enregistrés dans le tournoi")
         else:

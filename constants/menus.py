@@ -1,38 +1,3 @@
-DICT_START_MENU = {
-    "titre": "Bienvenue dans le menu principal de la gestion de tournois d'échecs",
-    1: [" 1 - Gérer les tournois", "Menu(DICT_TOURNAMENT_MENU)"],
-    2: [" 2 - Gérer les joueurs", "Menu(DICT_ACTORS_MENU)"],
-    3: [" 3 - Lancer/ reprendre un tournoi",
-        "TournamentManager(DICT_RUN_TOURNAMENT).run_tournament()"],
-    0: [" 0 - Sortir de l'application", "Quit()"]
-}
-
-DICT_ACTORS_MENU = {
-    "titre": "Bienvenue dans le menu de gestion des joueurs",
-    1: [" 1 - Ajouter un nouveau joueur",
-        "ActorsManager(DICT_CREATE_PLAYER_MENU).create_actor()"],
-    2: [" 2 - Mettre à jour le classement d'un joueur",
-        "ActorsManager(DICT_CREATE_PLAYER_MENU).update_rank_player()"],
-    3: [" 3 - Afficher la liste de tous les joueurs",
-        "ActorsManager(DICT_CREATE_PLAYER_MENU).list_actors()"],
-    4: [" 4 - Afficher la liste des joueurs  d'un tournoi",
-        "ActorsManager(DICT_CREATE_PLAYER_MENU).list_actors_in_tournament()"],
-    0: [" 0 - Revenir au menu précedent", "Menu(DICT_START_MENU)"]
-}
-
-DICT_TOURNAMENT_MENU = {
-    "titre": "Bienvenue dans le menu de gestion des tournois",
-    1: [" 1 - Ajouter un nouveau tournoi",
-        "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).create_tournament()"],
-    2: [" 2 - Afficher la liste de tous les tournois",
-        "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).list_tournaments()"],
-    3: [" 3 - Afficher la liste de tous les tours d'un tournoi",
-        "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).list_round_in_tournament()"],
-    4: [" 4 - Afficher la liste de tous les matchs d'un tournoi",
-        "TournamentManager(DICT_CREATE_TOURNAMENT_MENU).list_matches_by_round_in_tournament()"],
-    0: [" 0 - Revenir au menu précedent", "Menu(DICT_START_MENU)"]
-}
-
 DICT_CREATE_PLAYER_MENU = {
     "titre": "Bienvenue dans le menu création d'un joueur",
     "id": ["Quel est l'identifiant du joueur ? ", "[0-9]{3}$"],
@@ -45,7 +10,7 @@ DICT_CREATE_PLAYER_MENU = {
 }
 
 DICT_CREATE_TOURNAMENT_MENU = {
-    "titre": ["Bienvenue dans le menu création d'un tournoi", "Menu(DICT_TOURNAMENT_MENU)"],
+    "titre": ["Bienvenue dans le menu création d'un tournoi", "DICT_TOURNAMENT_MENU"],
     "id": ["Quel est l'identifiant du tournoi ? ", "[0-9]{3}$"],
     "name": ["Quel est le nom du tournoi ?", "^[A-Za-z0-9-_*]+$"],
     "site": ["Quel est le nom du site ? ", "^[A-Za-z0-9-_*]+$"],
@@ -77,4 +42,39 @@ DICT_UPDATE_RANK = {
 DICT_RUN_TOURNAMENT = {
     "titre": ["Bienvenue dans le menu de lancement d'un tournoi", ""],
     "id": ["Quel est l'identifiant du tournoi ? ", "[0-9]{3}$"],
+}
+
+DICT_START_MENU = {
+    "titre": "Bienvenue dans le menu principal de la gestion de tournois d'échecs",
+    1: [" 1 - Gérer les tournois", "setattr(self, 'dict_menu', DICT_TOURNAMENT_MENU)"],
+    2: [" 2 - Gérer les joueurs", "setattr(self, 'dict_menu', DICT_ACTORS_MENU)"],
+    3: [" 3 - Lancer/ reprendre un tournoi",
+        "self.tournament_manager.run_tournament()"],
+    0: [" 0 - Sortir de l'application", "self.quit()"]
+}
+
+DICT_ACTORS_MENU = {
+    "titre": "Bienvenue dans le menu de gestion des joueurs",
+    1: [" 1 - Ajouter un nouveau joueur",
+        "self.actors_manager.create_actor(DICT_CREATE_PLAYER_MENU)"],
+    2: [" 2 - Mettre à jour le classement d'un joueur",
+        "self.actors_manager.update_rank_player()"],
+    3: [" 3 - Afficher la liste de tous les joueurs",
+        "self.actors_manager.list_actors()"],
+    4: [" 4 - Afficher la liste des joueurs  d'un tournoi",
+        "self.actors_manager.list_actors_in_tournament()"],
+    0: [" 0 - Revenir au menu précedent", "setattr(self, 'dict_menu', DICT_START_MENU)"]
+}
+
+DICT_TOURNAMENT_MENU = {
+    "titre": "Bienvenue dans le menu de gestion des tournois",
+    1: [" 1 - Ajouter un nouveau tournoi",
+        "self.tournament_manager.create_tournament(DICT_CREATE_TOURNAMENT_MENU)"],
+    2: [" 2 - Afficher la liste de tous les tournois",
+        "self.tournament_manager.list_tournaments()"],
+    3: [" 3 - Afficher la liste de tous les tours d'un tournoi",
+        "self.tournament_manager.list_round_in_tournament()"],
+    4: [" 4 - Afficher la liste de tous les matchs d'un tournoi",
+        "self.tournament_manager.list_matches_by_round_in_tournament()"],
+    0: [" 0 - Revenir au menu précedent", "setattr(self, 'dict_menu', DICT_START_MENU)"]
 }

@@ -32,7 +32,7 @@ class Tournament:
     def stop_to_play(self):
         self.stop = get_date_hour()
 
-    def create_me(self, l_players_id, l_players_points):
+    def add_players(self, l_players_id, l_players_points):
         self.l_players_id = l_players_id
         self.l_players_points = l_players_points
 
@@ -51,49 +51,49 @@ class Tournament:
             l_sorted_players.append(id_player)
         return l_sorted_players
 
-    def serialize_me(self):
-        dict_tournament = {}
+    def serialize(self):
+        dict_tournament_info = {}
         for attribut in self._l_attribut:
             value = getattr(self, attribut)
             if attribut == "l_rounds":
                 rounds = value
                 l_rounds = []
                 for round in rounds:
-                    l_rounds.append(round.serialize_me())
+                    l_rounds.append(round.serialize())
                 value = l_rounds
-            dict_tournament[attribut] = value
-        return dict_tournament
+            dict_tournament_info[attribut] = value
+        return dict_tournament_info
 
-    def deserialize_me(self, dict_tournament):
+    def deserialize(self, dict_tournament_info):
         for attribut in self._l_attribut:
             if attribut == "l_rounds":
                 l_rounds = []
-                rounds = dict_tournament[attribut]
+                rounds = dict_tournament_info[attribut]
                 for round_item in rounds:
                     round = Round()
-                    round.deserialize_me(round_item)
+                    round.deserialize(round_item)
                     l_rounds.append(round)
                 setattr(self, attribut, l_rounds)
             else:
-                setattr(self, attribut, dict_tournament[attribut])
+                setattr(self, attribut, dict_tournament_info[attribut])
 
-    def update_me(self):
-        update = Query()
-        dict_tournament = self.serialize_me()
-        TOURNAMENTS.update(dict_tournament, update.id == self.id)
+    def update_db(self):
+        update_tournament = Query()
+        dict_tournament_info = self.serialize()
+        TOURNAMENTS.update(dict_tournament_info, update_tournament.id == self.id)
 
-    def insert_me(self):
-        dict_tournament = self.serialize_me()
-        TOURNAMENTS.insert(dict_tournament)
+    def insert_db(self):
+        dict_tournament_info = self.serialize()
+        TOURNAMENTS.insert(dict_tournament_info)
 
-    def save_me(self):
-        search_me = Query()
-        tournament_item = TOURNAMENTS.search(search_me.id == self.id)
+    def save_db(self):
+        search_tournament = Query()
+        tournament_item = TOURNAMENTS.search(search_tournament.id == self.id)
         if tournament_item:
-            self.update_me()
+            self.update_db()
             state = "update"
         else:
-            self.insert_me()
+            self.insert_db()
             state = "insert"
         return state
 
@@ -101,7 +101,7 @@ class Tournament:
         dict_all_tournaments = {}
         for tournament_item in TOURNAMENTS:
             tournament = Tournament()
-            tournament.deserialize_me(tournament_item)
+            tournament.deserialize(tournament_item)
             dict_all_tournaments[tournament.id] = tournament
         return dict_all_tournaments
 
@@ -109,8 +109,8 @@ class Tournament:
         if self.l_players_points and self.l_rounds:
             self._last_round = self.l_rounds[-1]
             for match in self._last_round.matches:
-                if isinstance(match.match, tuple) and (len(match.match) == 2):
-                    for player, score in match.match:
+                if isinstance(match.score, tuple) and (len(match.score) == 2):
+                    for player, score in match.score:
                         self.l_players_points[player][1] += score
             return True
 

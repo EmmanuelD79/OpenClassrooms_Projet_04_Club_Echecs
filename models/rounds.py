@@ -4,11 +4,11 @@ from models.matches import Match
 
 class Round:
 
-    def __init__(self):
-        self.tournament_id = ""
-        self.l_players_id = []
-        self.round_n = ""
-        self.id = ""
+    def __init__(self, tournament_id="", list_sort_players=[], round_n=1):
+        self.tournament_id = tournament_id
+        self.l_players_id = list_sort_players
+        self.round_n = round_n
+        self.id = f"Round {self.round_n}"
         self.start = None
         self.matches = []
         self.stop = None
@@ -30,42 +30,36 @@ class Round:
             couple = [list_sort_players[0], list_sort_players[1]]
         return couple
 
-    def create_me(self, tournament_id, list_sort_players, round_n):
-        self.tournament_id = tournament_id
-        self.round_n = round_n
-        self.id = "Round %i" % (self.round_n)
-        self.l_players_id = list_sort_players
-
     def create_match(self, couple_id, match_index):
-        match = Match()
-        match.create_me(self.tournament_id, self.id, match_index, couple_id)
+        match = Match(self.tournament_id, self.id, match_index, couple_id)
+        match.init_score()
         self.matches.append(match)
 
-    def add_matches(self, l_matches):
+    def update_matches(self, l_matches):
         self.matches = l_matches
 
-    def serialize_me(self):
+    def serialize(self):
         round = {}
         for attribut in self._l_attribut:
             if attribut == "matches":
                 matches = getattr(self, attribut)
                 l_matches = []
                 for match in matches:
-                    l_matches.append(match.serialize_me())
+                    l_matches.append(match.serialize())
                 value = l_matches
             else:
                 value = getattr(self, attribut)
             round[attribut] = value
         return round
 
-    def deserialize_me(self, round_item):
+    def deserialize(self, round_item):
         for round_key, attribut in zip(round_item, self._l_attribut):
             if attribut == "matches":
                 l_matches = []
                 matches = round_item[round_key]
                 for match_item in matches:
                     match = Match()
-                    match.deserialize_me(match_item)
+                    match.deserialize(match_item)
                     l_matches.append(match)
                 setattr(self, attribut, l_matches)
             else:

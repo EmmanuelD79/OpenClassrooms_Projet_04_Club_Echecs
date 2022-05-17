@@ -1,4 +1,4 @@
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 from constants.database import DB_FILENAME, TABLE_NAME_TOURNAMENTS, TABLE_NAME_ACTORS
 
 

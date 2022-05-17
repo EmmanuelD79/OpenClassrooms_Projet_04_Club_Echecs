@@ -20,44 +20,48 @@ class Actor:
     def update_rank(self, int_new_ranking):
         self.rank = int_new_ranking
 
-    def serialize_me(self):
-        dict_actors = {}
+    def serialize(self):
+        '''Serialize an actor object to an actor information dictionary
+        with an attributs list in order of init position'''
+        dict_actor_info = {}
         for attribut in self._l_attribut:
-            dict_actors[attribut] = getattr(self, attribut)
-        return dict_actors
+            dict_actor_info[attribut] = getattr(self, attribut)
+        return dict_actor_info
 
-    def deserialize_me(self, dict_actors):
-        actors = []
-        for key in dict_actors:
-            actors.append(dict_actors[key])
-        for attribut, data in zip(self._l_attribut, actors):
+    def deserialize(self, dict_actor_info):
+        '''Deserialize an actor information dictionary to actor object
+        with an attributs list in order of init position'''
+        l_actor_info = []
+        for key in dict_actor_info:
+            l_actor_info.append(dict_actor_info[key])
+        for attribut, data in zip(self._l_attribut, l_actor_info):
             setattr(self, attribut, data)
 
-    def update_me(self):
-        update = Query()
-        dict_actor = self.serialize_me()
-        ACTORS.update(dict_actor, update.id == self.id)
+    def update_db(self):
+        update_actor = Query()
+        dict_actor_info = self.serialize()
+        ACTORS.update(dict_actor_info, update_actor.id == self.id)
 
-    def insert_me(self):
-        dict_actor = self.serialize_me()
-        ACTORS.insert(dict_actor)
+    def insert_db(self):
+        dict_actor_info = self.serialize()
+        ACTORS.insert(dict_actor_info)
 
-    def save_me(self):
-        search_me = Query()
-        actor_item = ACTORS.search(search_me.id == self.id)
+    def save_db(self):
+        search_actor = Query()
+        actor_item = ACTORS.search(search_actor.id == self.id)
         if actor_item:
-            self.update_me()
+            self.update_db()
             state = "update"
         else:
-            self.insert_me()
+            self.insert_db()
             state = "insert"
         return state
 
     def load_all(self):
         dict_all_actors = {}
-        for actor_item in ACTORS:
+        for dict_actor_info in ACTORS:
             actor = Actor()
-            actor.deserialize_me(actor_item)
+            actor.deserialize(dict_actor_info)
             dict_all_actors[actor.id] = actor
         return dict_all_actors
 

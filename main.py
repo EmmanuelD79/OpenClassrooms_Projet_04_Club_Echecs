@@ -1,8 +1,12 @@
 from controllers.base import Controller
+from views.base import Command, Actors_report, Tournament_report
 
 
 def main():
-    controller = Controller()
+    view = Command()
+    actors_report = Actors_report()
+    tournament_report = Tournament_report()
+    controller = Controller(view, actors_report, tournament_report)
     controller.run()
 
 
