@@ -3,7 +3,7 @@ from models.tournaments import Tournament
 from models.rounds import Round
 from constants.menus import DICT_START_MENU,\
     DICT_TOURNAMENT_MENU, DICT_ACTORS_MENU, DICT_CREATE_TOURNAMENT_MENU, DICT_CREATE_PLAYER_MENU,\
-    DICT_SORT, DICT_UPDATE_RANK, DICT_RUN_TOURNAMENT
+    DICT_SORT, DICT_UPDATE_RANK, DICT_RUN_TOURNAMENT, DICT_UPDATE_SCORE
 from helpers.function import validate_format
 from constants.base import MAX_PLAYERS, MAX_MATCHES, MIN_PLAYERS, MIN_MATCHES, DEFAULT_SCORE, DEFAULT_NB_ROUND
 
@@ -39,7 +39,12 @@ class Controller:
         while self.validate:
             self.view.show_menu(self.dict_menu)
             choice = Controller.ask_menu_choice(self.dict_menu, self.view)
+            self.update_dict()
             eval(self.dict_menu[choice][1])
+
+    def update_dict(self):
+        self.tournament_manager.dict_actors = self.actors_manager.dict_actors
+        self.actors_manager.dict_tournament = self.tournament_manager.dict_tournaments
 
     def quit(self):
         self.view.show_quit()
@@ -138,12 +143,26 @@ class TournamentManager:
         if validate_exist_round:
             last_round = self.obj_tournament.l_rounds[-1]
             if last_round.stop is None:
-                response = self.view.show_update_score([], False)
+                msg = DICT_UPDATE_SCORE["confirmation"][0]
+                format = DICT_UPDATE_SCORE["confirmation"][1]
+                confirmation = False
+                while not confirmation:
+                    response = self.view.show_update_score([], "confirmation", msg)
+                    confirmation = validate_format(response, format)
+                    if confirmation is False:
+                        self.view.prompt_error("STR ERROR")
                 if response == "O":
                     l_matches = []
                     matches = last_round.matches
                     for match in matches:
-                        score = self.view.show_update_score(match.couple_id, True)
+                        msg = DICT_UPDATE_SCORE["score"][0]
+                        format = DICT_UPDATE_SCORE["score"][1]
+                        valide_score = False
+                        while not valide_score:
+                            score = self.view.show_update_score(match.couple_id, "score", msg)
+                            valide_score = validate_format(score, format)
+                            if valide_score is False:
+                                self.view.prompt_error("STR ERROR")
                         match.assign_score(score)
                         l_matches.append(match)
                     last_round.update_matches(l_matches)
@@ -155,6 +174,7 @@ class TournamentManager:
     def resume_matches_in_new_round(self):
         '''Resume matches of the new round in the tournament'''
         last_round = self.obj_tournament.l_rounds[-1]
+        self.report.show_match_round()
         for match in last_round.matches:
             self.report.show_match_round(match)
 
@@ -208,7 +228,7 @@ class TournamentManager:
         elif len(self.obj_tournament.l_players_id) == MAX_PLAYERS:
             players_validate = True
         else:
-            self.view.prompt_error()
+            self.view.prompt_error("NOT ENOUGH PLAYERS")
             players_validate = False
 
         return players_validate
@@ -227,6 +247,12 @@ class TournamentManager:
                 while not tournament_validate:
                     response = self.view.prompt_questions(msg, attribut)
                     tournament_validate = validate_format(response, valide_format)
+                    if tournament_validate is False:
+                        self.view.prompt_error("STR ERROR")
+                    if (attribut == "id") and (tournament_validate is True):
+                        if response in self.dict_tournaments:
+                            tournament_validate = False
+                            self.view.prompt_error("TOURNAMENT ON BASE")
                 if attribut == "control_time":
                     response = CONTROL_TIME[response]
                 setattr(tournament, attribut, response)
@@ -315,6 +341,12 @@ class ActorsManager:
             while not actors_validate:
                 attr_value = self.view.prompt_questions(msg, attribut)
                 actors_validate = validate_format(attr_value, valide_format)
+                if actors_validate is False:
+                    self.view.prompt_error("STR ERROR")
+                if (attribut == "id") and (actors_validate is True):
+                    if attr_value in self.dict_actors:
+                        actors_validate = False
+                        self.view.prompt_error("PLAYER ON BASE")
             if attribut == "rank":
                 attr_value = int(attr_value)
             setattr(actor, attribut, attr_value)

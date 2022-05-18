@@ -16,5 +16,8 @@ def get_list_attribut(my_obj):
 
 def validate_format(value, format):
     validate_format = re.match(format, value)
-    if validate_format:
-        return True
+    if validate_format is not None:
+        validate = True
+    else:
+        validate = False
+    return validate

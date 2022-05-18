@@ -19,7 +19,7 @@ DICT_CREATE_TOURNAMENT_MENU = {
                      "2 : un blitz \n"
                      "3 : un coup rapide \n"
                      "Quel est votre choix ? ", "[1-3]{1}$"],
-    "description": ["Voulez-vous ajouter un description ? ", ""]
+    "description": ["Voulez-vous ajouter une description ? ", ""]
 }
 
 DICT_SORT = {
@@ -37,6 +37,11 @@ DICT_UPDATE_RANK = {
     "confirmation": ["Vous avez changé son classement de %s par %s\nvoulez-vous confirmer O/N ?",
                      "(O|N){1}$"],
     "save": ["Le classement du joueur %s %s a été modifié pour %s", ""]
+}
+
+DICT_UPDATE_SCORE = {
+    "confirmation": ["Voulez-vous les mettre à jour ? O/N", "(O|N){1}$"],
+    "score": ["Qui le gagnant de ce match 1 / N / 2 ?", "(1|N|2){1}$"]
 }
 
 DICT_RUN_TOURNAMENT = {

@@ -1,3 +1,6 @@
+from constants.error_msg import ERROR
+
+
 class Command:
 
     def show_menu(self, dict_menu_to_show):
@@ -36,29 +39,25 @@ class Command:
             print(f"Joueur n° {increment} est {id_player}")
             print("tous les joueurs sont enregistrés dans le tournoi")
         else:
-            print(f"le joueur {id_player} n'est pas dans la base des joueurs")
+            self.prompt_error("PLAYER ON BASE")
 
-    def prompt_error(self):
-        print("Il n'y a pas assez de joueur dans la base")
+    def prompt_error(self, type_error):
+        print(ERROR[type_error])
 
-    def show_update_score(self, players, confirmation):
-        if not confirmation:
+    def show_update_score(self, players, attribut, msg):
+        if attribut == "confirmation":
             print("Le dernier round n'est pas fini")
             print(
                 "Vous devez mettre à jour les scores pour ce round"
             )
-            response = input(
-                "Voulez-vous les mettre à jour ? O/N"
-            )
+            response = input(msg)
         else:
             print(
                 f" Joueur : {players[0]} "
                 "contre Joueur : "
                 f"{players[1]}"
             )
-            response = input(
-                "Qui le gagnant de ce match 1 / N / 2 ?"
-            )
+            response = input(msg)
         return response
 
     def show_score(self, player, score, increment):
@@ -103,8 +102,11 @@ class Tournament_report:
         print("=" * len(msg_score))
         print()
 
-    def show_match_round(self, match):
-        print(match)
+    def show_match_round(self, match=""):
+        if match == "":
+            print("\nVoici les matches pour le nouveau tour:")
+        else:
+            print(match)
 
 
 class Actors_report:
