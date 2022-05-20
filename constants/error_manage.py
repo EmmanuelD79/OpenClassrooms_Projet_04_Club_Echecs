@@ -1,0 +1,7 @@
+PLAYER_NONE = "Le joueur n'est pas dans la base de données"
+PLAYER_EXIST = "Le joueur est déja dans la base de données"
+PLAYER_EXIST_IN_TOURNAMENT = "Le joueur est déja dans la liste du tournoi"
+TOURNAMENT_NONE = "Le tournoi n'est pas dans la base de données"
+TOURNAMENT_EXIST = "Le tournoi est déja dans la base de données"
+PLAYERS_NOT_ENOUGH = "Vous n'avez pas assez de joueur dans la base de données"
+BAD_TYPO = "Vous avez fait une erreur de frappe"

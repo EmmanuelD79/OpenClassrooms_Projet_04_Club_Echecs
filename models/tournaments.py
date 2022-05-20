@@ -1,7 +1,7 @@
 from models.db import TOURNAMENTS
 from models.rounds import Round
 from tinydb import Query
-from constants.base import DEFAULT_NB_ROUND
+import constants.config as DEFAULT
 from helpers.function import get_date_hour, get_list_attribut
 
 
@@ -16,7 +16,7 @@ class Tournament:
         self.stop = None
         self.l_players_id = []
         self.l_rounds = []
-        self.nb_rounds = DEFAULT_NB_ROUND
+        self.nb_rounds = DEFAULT.NB_ROUND
         self.control_time = ""
         self.description = ""
         self.l_done_matches = []
@@ -97,14 +97,6 @@ class Tournament:
             state = "insert"
         return state
 
-    def load_all(self):
-        dict_all_tournaments = {}
-        for tournament_item in TOURNAMENTS:
-            tournament = Tournament()
-            tournament.deserialize(tournament_item)
-            dict_all_tournaments[tournament.id] = tournament
-        return dict_all_tournaments
-
     def set_points(self):
         if self.l_players_points and self.l_rounds:
             self._last_round = self.l_rounds[-1]
@@ -128,3 +120,12 @@ class Tournament:
                          f"\nle score des joueurs :\n{txt_score}" \
                          f"\n{self.l_rounds}\n {txt_stop}\n"
         return rep_tournament
+
+    @classmethod
+    def load_all(cls):
+        dict_all_tournaments = {}
+        for tournament_item in TOURNAMENTS:
+            tournament = Tournament()
+            tournament.deserialize(tournament_item)
+            dict_all_tournaments[tournament.id] = tournament
+        return dict_all_tournaments

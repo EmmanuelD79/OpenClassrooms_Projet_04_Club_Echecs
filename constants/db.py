@@ -1,3 +1,5 @@
-DB_FILENAME = "db.json"
+from pathlib import Path
+
+DB_FILENAME = Path("db.json")
 TABLE_NAME_ACTORS = "JOUEURS"
 TABLE_NAME_TOURNAMENTS = "TOURNOIS"

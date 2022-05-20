@@ -57,14 +57,15 @@ class Actor:
             state = "insert"
         return state
 
-    def load_all(self):
+    def __repr__(self):
+        rep_actor = f"{self.first_name}, {self.last_name}, {self.date_of_birth}, {self.sex}, {self.rank}"
+        return rep_actor
+
+    @classmethod
+    def load_all(cls):
         dict_all_actors = {}
         for dict_actor_info in ACTORS:
             actor = Actor()
             actor.deserialize(dict_actor_info)
             dict_all_actors[actor.id] = actor
         return dict_all_actors
-
-    def __repr__(self):
-        rep_actor = f"{self.first_name}, {self.last_name}, {self.date_of_birth}, {self.sex}, {self.rank}"
-        return rep_actor

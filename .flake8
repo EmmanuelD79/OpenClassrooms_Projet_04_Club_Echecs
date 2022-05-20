@@ -1,5 +1,4 @@
 [flake8]
-ignore = F401
 exclude =
     env,
     .MD,

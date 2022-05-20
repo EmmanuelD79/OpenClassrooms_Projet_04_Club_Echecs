@@ -4,9 +4,9 @@ from models.matches import Match
 
 class Round:
 
-    def __init__(self, tournament_id="", list_sort_players=[], round_n=1):
+    def __init__(self, tournament_id="", list_sort_players=None, round_n=1):
         self.tournament_id = tournament_id
-        self.l_players_id = list_sort_players
+        self.l_players_id = [] if list_sort_players is None else list_sort_players
         self.round_n = round_n
         self.id = f"Round {self.round_n}"
         self.start = None

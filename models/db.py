@@ -1,6 +1,5 @@
-from tinydb import TinyDB, Query
-from constants.database import DB_FILENAME, TABLE_NAME_TOURNAMENTS, TABLE_NAME_ACTORS
-
+from tinydb import TinyDB
+from constants.db import DB_FILENAME, TABLE_NAME_TOURNAMENTS, TABLE_NAME_ACTORS
 
 DB = TinyDB(DB_FILENAME)
 ACTORS = DB.table(TABLE_NAME_ACTORS)

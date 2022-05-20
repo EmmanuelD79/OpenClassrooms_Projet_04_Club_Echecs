@@ -1,11 +1,11 @@
 from controllers.base import Controller
-from views.base import Command, Actors_report, Tournament_report
+from views.base import CommandView, ActorsReport, TournamentReport
 
 
 def main():
-    view = Command()
-    actors_report = Actors_report()
-    tournament_report = Tournament_report()
+    view = CommandView()
+    actors_report = ActorsReport()
+    tournament_report = TournamentReport()
     controller = Controller(view, actors_report, tournament_report)
     controller.run()
 
