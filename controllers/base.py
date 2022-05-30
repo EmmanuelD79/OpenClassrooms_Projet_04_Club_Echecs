@@ -49,9 +49,12 @@ class Controller:
         validate = False
         while not validate:
             attr_value = view.prompt_questions(MENU.RUN_TOURNAMENT["id"][0], "id")
+
             if attr_value in dict_tournaments:
                 obj_tournament = dict_tournaments[attr_value]
                 return obj_tournament
+            elif attr_value == "":
+                return None
             else:
                 view.display_error(ERROR.TOURNAMENT_NONE)
 
@@ -80,24 +83,25 @@ class TournamentManager:
     def run_tournament(self):
         '''Run the tournament and manage the round and matches'''
         self.obj_tournament = Controller.ask_tournament_id(self.dict_tournaments, self.view)
-        players_validate = self.add_player_in_tournament()
-        if players_validate:
-            validate_exist_round = self.check_round_n()
-            self.update_score_last_round(validate_exist_round)
-            round_n = len(self.obj_tournament.l_rounds)
-            if 0 <= round_n < DEFAULT.NB_ROUND:
-                self.create_new_round(round_n)
-                self.resume_matches_in_new_round()
-            else:
-                if self.obj_tournament.stop is None:
-                    stop_validate = self.view.prompt_stop_tournament()
-                    if stop_validate:
-                        self.obj_tournament.stop_to_play()
-                        self.rank_players()
-                        self.obj_tournament.save_db()
-                        self.dict_tournaments = Tournament.load_all()
+        if self.obj_tournament is not None:
+            players_validate = self.add_player_in_tournament()
+            if players_validate:
+                validate_exist_round = self.check_round_n()
+                self.update_score_last_round(validate_exist_round)
+                round_n = len(self.obj_tournament.l_rounds)
+                if 0 <= round_n < DEFAULT.NB_ROUND:
+                    self.create_new_round(round_n)
+                    self.resume_matches_in_new_round()
                 else:
-                    self.rank_players()
+                    if self.obj_tournament.stop is None:
+                        stop_validate = self.view.prompt_stop_tournament()
+                        if stop_validate:
+                            self.obj_tournament.stop_to_play()
+                            self.rank_players()
+                            self.obj_tournament.save_db()
+                            self.dict_tournaments = Tournament.load_all()
+                    else:
+                        self.rank_players()
 
     def create_new_round(self, round_n):
         '''Create a new round in the tournament'''
@@ -108,14 +112,16 @@ class TournamentManager:
             couple_validate = False
             while not couple_validate:
                 couple_players = new_round.pair_players(list_sort_players)
-                couple_validate = self.validate_pair_players(couple_players, self.obj_tournament.l_done_matches)
+                couple_validate = self.validate_pair_players(couple_players,
+                                                             self.obj_tournament.l_done_matches)
                 if couple_validate:
                     self.obj_tournament.l_done_matches.append(couple_players)
                     new_round.create_match(couple_players, match_index)
                     list_sort_players.pop(list_sort_players.index(couple_players[0]))
                     list_sort_players.pop(list_sort_players.index(couple_players[1]))
                 else:
-                    list_sort_players = self.change_list_players(list_sort_players, index_list_sort_players)
+                    list_sort_players = self.change_list_players(list_sort_players,
+                                                                 index_list_sort_players)
                     index_list_sort_players += 1
         new_round.start_to_play()
         self.obj_tournament.add_round(new_round)
@@ -129,7 +135,7 @@ class TournamentManager:
         for player_id in rank:
             player = self.dict_actors[player_id]
             score = self.obj_tournament.l_players_points[player_id]
-            self.view.display_score(player, score, index_player)
+            self.view.display_score(player_id, player, score, index_player)
             index_player += 1
 
     def update_score_last_round(self, validate_exist_round):
@@ -170,7 +176,7 @@ class TournamentManager:
         last_round = self.obj_tournament.l_rounds[-1]
         self.view.display_match_round()
         for match in last_round.matches:
-            self.report.display_match_round(match)
+            self.view.display_match_round(match)
 
     def check_round_n(self):
         '''Check the n° of the current round'''
@@ -190,8 +196,12 @@ class TournamentManager:
 
     def change_list_players(self, list_players, increment):
         '''Take the next player, if the couple players already exists'''
-        list_players[1], list_players[increment + 1] = list_players[increment + 1], list_players[1]
-        return list_players
+        try:
+            list_players[1], list_players[increment + 1] = list_players[increment + 1],\
+                                                           list_players[1]
+            return list_players
+        except IndexError:
+            self.view.display_error(ERROR.LIST_PLAYERS)
 
     def add_player_in_tournament(self):
         '''Add players in current tournament if the list players don't exists'''
@@ -271,28 +281,32 @@ class TournamentManager:
     def list_round_in_tournament(self):
         '''Manage the list of round for one tournament'''
         self.obj_tournament = Controller.ask_tournament_id(self.dict_tournaments, self.view)
-        obj_rounds = self.obj_tournament.l_rounds
-        for obj_round in obj_rounds:
-            self.report.display_list_round_in_tournament(obj_round.id, obj_round.start, obj_round.stop)
+        if self.obj_tournament is not None:
+            obj_rounds = self.obj_tournament.l_rounds
+            for obj_round in obj_rounds:
+                self.report.display_list_round_in_tournament(obj_round.id,
+                                                             obj_round.start,
+                                                             obj_round.stop)
 
     def list_matches_by_round_in_tournament(self):
         '''Manage the list of matches for one tournament'''
         self.obj_tournament = Controller.ask_tournament_id(self.dict_tournaments, self.view)
-        obj_rounds = self.obj_tournament.l_rounds
-        for obj_round in obj_rounds:
-            for obj_match in obj_round.matches:
-                player_1 = obj_match.score[0][0]
-                player_2 = obj_match.score[1][0]
-                score_player_1 = obj_match.score[0][1]
-                score_player_2 = obj_match.score[1][1]
-                self.report.display_list_matches_in_tournament(
-                    obj_match.match_index,
-                    obj_match.round_id,
-                    player_1,
-                    player_2,
-                    score_player_1,
-                    score_player_2
-                )
+        if self.obj_tournament is not None:
+            obj_rounds = self.obj_tournament.l_rounds
+            for obj_round in obj_rounds:
+                for obj_match in obj_round.matches:
+                    player_1 = obj_match.score[0][0]
+                    player_2 = obj_match.score[1][0]
+                    score_player_1 = obj_match.score[0][1]
+                    score_player_2 = obj_match.score[1][1]
+                    self.report.display_list_matches_in_tournament(
+                        obj_match.match_index,
+                        obj_match.round_id,
+                        player_1,
+                        player_2,
+                        score_player_1,
+                        score_player_2
+                    )
 
 
 class ActorsManager:

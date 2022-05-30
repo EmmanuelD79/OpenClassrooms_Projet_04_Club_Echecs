@@ -30,10 +30,14 @@ class CommandView:
             response = input(msg)
         return response
 
-    def display_score(self, player, score, index_player):
+    def display_score(self, player_id, player, score, index_player):
+        point = "point"
+        if score[1] > 1:
+            point += "s"
         print(
-            f"{index_player} - {player.first_name} {player.last_name} ({player.rank}) "
-            f"a obtenu {score[1]} point(s)")
+            f"n°{index_player} {player.first_name} {player.last_name} "
+            f"(id:{player_id} classé :{player.rank}) "
+            f"a obtenu {float(score[1])} {point}")
 
     def display_error(self, type_error):
         print(type_error)
