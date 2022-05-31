@@ -14,11 +14,11 @@ class CommandView:
         else:
             print(match)
 
-    def display_update_score(self, players, attribut, msg):
+    def display_update_score(self, players, attribut, msg, round_id):
         if attribut == "confirmation":
-            print("Le dernier round n'est pas fini")
+            print(f"Le {round_id} n'est pas fini")
             print(
-                "Vous devez mettre à jour les scores pour ce round"
+                "Pour le finaliser, vous devez mettre à jour les scores"
             )
             response = input(msg)
         else:
@@ -30,14 +30,23 @@ class CommandView:
             response = input(msg)
         return response
 
-    def display_score(self, player_id, player, score, index_player):
-        point = "point"
-        if score[1] > 1:
-            point += "s"
-        print(
-            f"n°{index_player} {player.first_name} {player.last_name} "
-            f"(id:{player_id} classé :{player.rank}) "
-            f"a obtenu {float(score[1])} {point}")
+    def display_score(self, player_id="", player="", score="", index_player=""):
+        '''Display the rank of players with the pluralization of the word "point"
+
+            the magic number 1 is used for the pluralization.
+            If the score is greater than one to put an "s" in point
+
+        '''
+        if player_id == "" and player == "" and score == "" and index_player == "":
+            print("\nVoici le classement du tournoi :\n")
+        elif player_id != "" and player != "" and score != "" and index_player != "":
+            point = "point"
+            if score[1] > 1:
+                point += "s"
+            print(
+                f"n°{index_player} {player.first_name} {player.last_name} "
+                f"(id:{player_id} classé :{player.rank}) "
+                f"a obtenu {float(score[1])} {point}")
 
     def display_error(self, type_error):
         print(type_error)
@@ -113,16 +122,14 @@ class TournamentReport:
         print(msg_stop)
         print("=" * len(msg_stop))
 
-    def display_list_matches_in_tournament(
-            self,
-            match_id,
-            round_id,
-            player_1,
-            player_2,
-            score_player_1,
-            score_player_2
-    ):
-
+    def display_list_matches_in_tournament(self,
+                                           match_id,
+                                           round_id,
+                                           player_1,
+                                           player_2,
+                                           score_player_1,
+                                           score_player_2
+                                           ):
         if score_player_1 == 1:
             msg_score = f"Le joueur : {player_1} est le vainqueur du match"
         elif score_player_2 == 1:

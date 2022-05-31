@@ -8,6 +8,7 @@ import constants.config as DEFAULT
 import constants.menus as MENU
 import constants.error_manage as ERROR
 
+
 # index de l'attribut last_name dans l'objet Actor
 INDEX_LAST_NAME = 2
 
@@ -91,7 +92,9 @@ class TournamentManager:
                 round_n = len(self.obj_tournament.l_rounds)
                 if 0 <= round_n < DEFAULT.NB_ROUND:
                     self.create_new_round(round_n)
+                    self.rank_players()
                     self.resume_matches_in_new_round()
+
                 else:
                     if self.obj_tournament.stop is None:
                         stop_validate = self.view.prompt_stop_tournament()
@@ -131,6 +134,7 @@ class TournamentManager:
     def rank_players(self):
         '''Rank players in tournament'''
         rank = self.obj_tournament.sort_players_by_points_and_rank()
+        self.view.display_score()
         index_player = 1
         for player_id in rank:
             player = self.dict_actors[player_id]
@@ -147,7 +151,7 @@ class TournamentManager:
                 format = MENU.UPDATE_SCORE["confirmation"][1]
                 confirmation = False
                 while not confirmation:
-                    response = self.view.display_update_score([], "confirmation", msg)
+                    response = self.view.display_update_score([], "confirmation", msg, last_round.id)
                     confirmation = validate_format(response, format)
                     if confirmation is False:
                         self.view.display_error(ERROR.BAD_TYPO)
@@ -159,7 +163,7 @@ class TournamentManager:
                         format = MENU.UPDATE_SCORE["score"][1]
                         valide_score = False
                         while not valide_score:
-                            score = self.view.display_update_score(match.couple_id, "score", msg)
+                            score = self.view.display_update_score(match.couple_id, "score", msg, last_round.id)
                             valide_score = validate_format(score, format)
                             if valide_score is False:
                                 self.view.display_error(ERROR.BAD_TYPO)

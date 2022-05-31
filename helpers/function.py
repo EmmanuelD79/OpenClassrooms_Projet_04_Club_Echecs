@@ -1,9 +1,9 @@
 import re
-from datetime import datetime as d
+from datetime import datetime
 
 
 def get_date_hour():
-    return d.now().strftime("Le %d/%m/%Y à %H:%M:%S")
+    return datetime.now().strftime("Le %d/%m/%Y à %H:%M:%S")
 
 
 def get_list_attribut(my_obj):

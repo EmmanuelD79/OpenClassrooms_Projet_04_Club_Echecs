@@ -1,8 +1,8 @@
 CREATE_PLAYER = {
     "titre": "Bienvenue dans le menu création d'un joueur",
     "id": ["Quel est l'identifiant du joueur ? ", "[0-9]{3}$"],
-    "first_name": ["Quel est le prénom du joueur ? ", "^[A-Za-z-]+$"],
-    "last_name": ["Quel est le nom du joueur ? ", "^[A-Za-z-]+$"],
+    "first_name": ["Quel est le prénom du joueur ? ", "^[ A-Za-z-]+$"],
+    "last_name": ["Quel est le nom du joueur ? ", "^[ A-Za-z-]+$"],
     "date_of_birth": ["Quel est le date de naissance du joueur (jj/mm/aaaa) ? ",
                       "(3[01]|[12][0-9]|0?[1-9])/(1[0-2]|0?[1-9])/([0-9]{4})"],
     "sex": ["Quel est le sexe du joueur M ou F ? ", "(M|F){1}$"],
@@ -12,8 +12,8 @@ CREATE_PLAYER = {
 CREATE_TOURNAMENT = {
     "titre": ["Bienvenue dans le menu création d'un tournoi", "MENU.TOURNAMENT_MANAGE"],
     "id": ["Quel est l'identifiant du tournoi ? ", "[0-9]{3}$"],
-    "name": ["Quel est le nom du tournoi ?", "^[A-Za-z0-9-_*]+$"],
-    "site": ["Quel est le nom du site ? ", "^[A-Za-z0-9-_*]+$"],
+    "name": ["Quel est le nom du tournoi ?", "^[ A-Za-z0-9-_*]+$"],
+    "site": ["Quel est le nom du site ? ", "^[ A-Za-z0-9-_*]+$"],
     "control_time": ["Quel controle du temps désirez-vous \n"
                      "1 : un bullet \n"
                      "2 : un blitz \n"
