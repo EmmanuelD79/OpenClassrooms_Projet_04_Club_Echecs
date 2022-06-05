@@ -400,38 +400,41 @@ class ActorsManager:
 
     def update_rank_player(self):
         '''Do the rank of one player update'''
-        for key_menu in MENU.UPDATE_RANK:
-            if key_menu == "titre":
-                self.view.prompt_questions(MENU.UPDATE_RANK["titre"][0], "titre")
-            elif key_menu == "id":
-                msg = MENU.UPDATE_RANK[key_menu][0]
-                id_validate = False
-                while not id_validate:
-                    response = self.view.prompt_questions(msg, key_menu)
-                    if response in self.dict_actors:
-                        obj_actor = self.dict_actors[response]
-                        id_validate = True
-                    else:
-                        id_validate = False
-            elif key_menu == "rank":
-                msg = MENU.UPDATE_RANK[key_menu][0] % (obj_actor.first_name, obj_actor.last_name, obj_actor.rank)
-                valide_format = MENU.UPDATE_RANK[key_menu][1]
-                rank_validate = False
-                while not rank_validate:
-                    new_rank = self.view.prompt_questions(msg, key_menu)
-                    rank_validate = validate_format(new_rank, valide_format)
-            elif key_menu == "confirmation":
-                msg = MENU.UPDATE_RANK[key_menu][0] % (obj_actor.rank, new_rank)
-                valide_format = MENU.UPDATE_RANK[key_menu][1]
-                new_rank_validate = False
-                while not new_rank_validate:
-                    response = self.view.prompt_questions(msg, key_menu)
-                    new_rank_validate = validate_format(response, valide_format)
-                    if response == "O":
-                        obj_actor.update_rank(int(new_rank))
-                        obj_actor.save_db()
-                        self.dict_actors = Actor.load_all()
-                        msg = MENU.UPDATE_RANK["save"][0] % (obj_actor.first_name,
-                                                             obj_actor.last_name,
-                                                             new_rank)
-                        self.view.prompt_questions(msg, "save")
+        if self.dict_actors != {}:
+            for key_menu in MENU.UPDATE_RANK:
+                if key_menu == "titre":
+                    self.view.prompt_questions(MENU.UPDATE_RANK["titre"][0], "titre")
+                elif key_menu == "id":
+                    msg = MENU.UPDATE_RANK[key_menu][0]
+                    id_validate = False
+                    while not id_validate:
+                        response = self.view.prompt_questions(msg, key_menu)
+                        if response in self.dict_actors:
+                            obj_actor = self.dict_actors[response]
+                            id_validate = True
+                        else:
+                            id_validate = False
+                elif key_menu == "rank":
+                    msg = MENU.UPDATE_RANK[key_menu][0] % (obj_actor.first_name, obj_actor.last_name, obj_actor.rank)
+                    valide_format = MENU.UPDATE_RANK[key_menu][1]
+                    rank_validate = False
+                    while not rank_validate:
+                        new_rank = self.view.prompt_questions(msg, key_menu)
+                        rank_validate = validate_format(new_rank, valide_format)
+                elif key_menu == "confirmation":
+                    msg = MENU.UPDATE_RANK[key_menu][0] % (obj_actor.rank, new_rank)
+                    valide_format = MENU.UPDATE_RANK[key_menu][1]
+                    new_rank_validate = False
+                    while not new_rank_validate:
+                        response = self.view.prompt_questions(msg, key_menu)
+                        new_rank_validate = validate_format(response, valide_format)
+                        if response == "O":
+                            obj_actor.update_rank(int(new_rank))
+                            obj_actor.save_db()
+                            self.dict_actors = Actor.load_all()
+                            msg = MENU.UPDATE_RANK["save"][0] % (obj_actor.first_name,
+                                                                 obj_actor.last_name,
+                                                                 new_rank)
+                            self.view.prompt_questions(msg, "save")
+        else:
+            self.view.display_error(ERROR.NO_PLAYERS)
