@@ -56,7 +56,7 @@ source env/bin/activate
 
 Pour utiliser ce projet, il est nécessaire d'installer les modules du fichier requirements.txt.
 
-<br>Pour installer automatiquement ces modules, vous pouvez utiliser dans votre terminal la commande suivante :
+<br>Pour installer automatiquement ces modules, dans votre terminal, vous devez aller dans le dossier du projet et ensuite taper la commande suivante :
 	<br> 
 ```
 
