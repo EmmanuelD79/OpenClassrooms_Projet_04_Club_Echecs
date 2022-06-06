@@ -99,33 +99,37 @@ class TournamentManager:
                     if self.obj_tournament.stop is None:
                         stop_validate = self.view.prompt_stop_tournament()
                         if stop_validate:
-                            self.obj_tournament.stop_to_play()
-                            self.rank_players()
-                            self.obj_tournament.save_db()
-                            self.dict_tournaments = Tournament.load_all()
+                            self.stop_tournament()
+
                     else:
                         self.rank_players()
 
     def create_new_round(self, round_n):
         '''Create a new round in the tournament'''
-        list_sort_players = self.obj_tournament.sort_players_by_points_and_rank()
-        new_round = Round(self.obj_tournament.id, list_sort_players, round_n + 1)
+        list_sort_players = [self.obj_tournament.sort_players_by_points_and_rank(), False]
+        new_round = Round(self.obj_tournament.id, list_sort_players[0], round_n + 1)
         for match_index in range(DEFAULT.MIN_MATCHES, DEFAULT.MAX_MATCHES + 1):
             index_list_sort_players = 1
             couple_validate = False
             while not couple_validate:
-                couple_players = new_round.pair_players(list_sort_players)
+                couple_players = new_round.pair_players(list_sort_players[0])
                 couple_validate = self.validate_pair_players(couple_players,
                                                              self.obj_tournament.l_done_matches)
                 if couple_validate:
                     self.obj_tournament.l_done_matches.append(couple_players)
                     new_round.create_match(couple_players, match_index)
-                    list_sort_players.pop(list_sort_players.index(couple_players[0]))
-                    list_sort_players.pop(list_sort_players.index(couple_players[1]))
+                    list_sort_players[0].pop(list_sort_players[0].index(couple_players[0]))
+                    list_sort_players[0].pop(list_sort_players[0].index(couple_players[1]))
+
                 else:
-                    list_sort_players = self.change_list_players(list_sort_players,
+                    list_sort_players = self.change_list_players(list_sort_players[0],
                                                                  index_list_sort_players)
-                    index_list_sort_players += 1
+                    if list_sort_players[1]:
+                        self.obj_tournament.l_done_matches.append(couple_players)
+                        new_round.create_match(couple_players, match_index)
+                        break
+                    else:
+                        index_list_sort_players += 1
         new_round.start_to_play()
         self.obj_tournament.add_round(new_round)
         self.obj_tournament.save_db()
@@ -200,12 +204,21 @@ class TournamentManager:
 
     def change_list_players(self, list_players, increment):
         '''Take the next player, if the couple players already exists'''
+
         try:
             list_players[1], list_players[increment + 1] = list_players[increment + 1],\
                                                            list_players[1]
-            return list_players
+            return [list_players, False]
         except IndexError:
             self.view.display_error(ERROR.LIST_PLAYERS)
+            return [list_players, True]
+
+    def stop_tournament(self):
+
+        self.obj_tournament.stop_to_play()
+        self.rank_players()
+        self.obj_tournament.save_db()
+        self.dict_tournaments = Tournament.load_all()
 
     def add_player_in_tournament(self):
         '''Add players in current tournament if the list players don't exists'''

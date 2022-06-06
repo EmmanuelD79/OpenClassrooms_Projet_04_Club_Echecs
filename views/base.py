@@ -50,6 +50,7 @@ class CommandView:
 
     def display_error(self, type_error):
         print(type_error)
+        input("Appuyer sur une touche pour continuer")
 
     def display_quit(self):
         print("Au revoir")
